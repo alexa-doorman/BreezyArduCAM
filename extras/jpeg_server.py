@@ -41,6 +41,7 @@ BAUD = 921600       # Change to 115200 for Due
 
 
 def flush(port):
+    sendbyte(port, 0)
     print('Flushing...')
     while True:
         b = port.read()
