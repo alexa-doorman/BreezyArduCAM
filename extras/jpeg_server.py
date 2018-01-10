@@ -41,6 +41,7 @@ BAUD = 921600       # Change to 115200 for Due
 
 
 def flush(port):
+    print('Flushing...')
     while True:
         b = port.read()
 
@@ -48,10 +49,10 @@ def flush(port):
             break
 
         try:
-            print(b.decode())
+            print(b.decode(), end='')
         except:
-            print(b)
-
+            print(b, end='')
+    print('Flush complete!')
 
 @app.route('/frame')
 def frame():
