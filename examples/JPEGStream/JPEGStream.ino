@@ -22,7 +22,7 @@ along with BreezyArduCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <BreezyArduCAM.h>
 #include <SPI.h>
 
-static const int CS = 10;
+static const int CS = 7;
 
 Serial_ArduCAM_FrameGrabber fg;
 
