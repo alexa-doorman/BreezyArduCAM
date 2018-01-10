@@ -54,12 +54,14 @@ def flush(port):
             print(b, end='')
     print('Flush complete!')
 
+
 @app.route('/frame')
 def frame():
-        # Open connection to Arduino with a timeout of two seconds
-    port = serial.Serial(PORT, BAUD, timeout=2)
+    # Open connection to Arduino with a timeout of two seconds
     # Report acknowledgment from camera
     # getack(port)
+    port = serial.Serial(PORT, BAUD, timeout=2)
+
     flush(port)
 
     # Send start flag
@@ -144,7 +146,7 @@ def stream():
             currbyte = port.read(1)
 
             # If we've already read one byte, we can check pairs of bytes
-            if prevbyte:
+            if prevbyte and currbyte:
                 # Start-of-image sentinel bytes: write previous byte to temp file
                 if ord(currbyte) == 0xd8 and ord(prevbyte) == 0xff:
                     tmpfile.write(prevbyte)
