@@ -27,8 +27,8 @@ from helpers import *
 
 # Modifiable params --------------------------------------------------------------------
 
-PORT = '/dev/ttyACM0' # Ubuntu
-#PORT = 'COM4'         # Windows
+# PORT = '/dev/ttyACM0' # Ubuntu
+PORT = 'COM17'         # Windows
 
 BAUD = 921600       # Change to 115200 for Due
 
