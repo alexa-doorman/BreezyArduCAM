@@ -26,7 +26,7 @@
 #include <FS.h>
 
 // set pin 10 as the slave select for the digital pot:
-static const int CS = 10;
+static const int CS = 7;
 
 // arbitrary name for image file
 static const char * FILENAME = "/test.bmp";

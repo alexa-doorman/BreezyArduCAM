@@ -1,5 +1,10 @@
 # A simple Arduino API for ArduCAM Mini
 
+
+## avrdude Upload Hex
+`avrdude -v -patmega328P -carduino -P /dev/ttyACM0 -D -Uflash:w:./hex/JPEGStream.ino.hex:i`
+
+
 <img src="image.png" width=200>
 
 This repository contains an Arduino library and examples for the popular ArduCAM Mini camera. 
