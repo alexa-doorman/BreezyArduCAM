@@ -38,6 +38,15 @@ from helpers import *
 PORT = os.environ.get('SERIAL_PORT', '/dev/ttyACM0')
 
 BAUD = 921600       # Change to 115200 for Due
+port = None
+
+
+@app.before_first_request
+def spin():
+    global port
+    port = serial.Serial(PORT, BAUD, timeout=2)
+
+    flush(port)
 
 
 def flush(port):
@@ -48,23 +57,11 @@ def flush(port):
 
         if len(b) < 1:
             break
-
-        try:
-            print(b.decode(), end='')
-        except:
-            print(b, end='')
     print('Flush complete!')
 
 
 @app.route('/frame')
 def frame():
-    # Open connection to Arduino with a timeout of two seconds
-    # Report acknowledgment from camera
-    # getack(port)
-    port = serial.Serial(PORT, BAUD, timeout=2)
-
-    flush(port)
-
     # Send start flag
     sendbyte(port, 1)
 
@@ -118,15 +115,10 @@ def frame():
 
 def stream():
     # Open connection to Arduino with a timeout of two seconds
-    port = serial.Serial(PORT, BAUD, timeout=2)
-    # Report acknowledgment from camera
-    # getack(port)
-    flush(port)
-    # Wait a spell
-    # time.sleep(0.1)
 
     # Send start flag
     sendbyte(port, 1)
+    print('sent start')
 
     # We'll report frames-per-second
     start = time.time()
@@ -142,7 +134,6 @@ def stream():
         prevbyte = None
         tmpfile = BytesIO()
         while not done:
-
             # Read a byte from Arduino
             currbyte = port.read(1)
 
@@ -161,10 +152,15 @@ def stream():
                 if ord(currbyte) == 0xd9 and ord(prevbyte) == 0xff:
                     # tmpfile.close()
                     tmpfile.seek(0)
+
+                    if tmpfile.getbuffer().nbytes < 1000:  # expect at least 3kb file
+                        print('file skipped')
+                        count += 1
+                        break
+
                     try:
                         yield (b'--frame\r\n'
                                b'Content-Type: image/jpeg\r\n\r\n' + tmpfile.getvalue() + b'\r\n\r\n')
-
                     except:
                         pass
                     count += 1
@@ -184,8 +180,13 @@ def stream():
 
 @app.route('/')
 def video_feed():
-    return Response(stream(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    try:
+        return Response(stream(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    except:
+        flush(port)
+        return Response(stream(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
